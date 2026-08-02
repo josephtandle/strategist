@@ -65,4 +65,4 @@ Everything stays on your machine: your config, your notes, your briefs. The busi
 
 ## License
 
-Personal & Internal Use License. Free to use and modify for yourself or inside your own business. No reselling, no redistribution, no offering it as a service. See LICENSE for the full terms.
+Personal Use License. You can use this for yourself, but you cannot resell it, share it, or use it in any commercial service. If you need to use it commercially, reach out through github.com/josephtandle and we can figure out something that makes sense. See LICENSE for the full terms.
