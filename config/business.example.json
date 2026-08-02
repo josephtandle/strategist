@@ -1,0 +1,48 @@
+{
+  "owner": "Your name",
+  "business": {
+    "name": "Example: Brightpage Studio",
+    "whatItIs": "Example: a two-person copywriting studio serving online course creators",
+    "customers": "Example: course creators doing 10k to 50k per launch who hate writing their own emails",
+    "offer": "Example: done-for-you launch email sequences at a flat project price"
+  },
+  "mission": {
+    "statement": "Example: reach 10 retainer clients by the end of the quarter without hiring",
+    "deadline": "Example: 2026-09-30",
+    "successLooksLike": [
+      "Example: 10 active retainers",
+      "Example: a referral system that produces 2 warm leads per week"
+    ]
+  },
+  "goals": [
+    {
+      "goal": "Example: close 2 new retainer clients",
+      "by": "Example: 2026-08-15",
+      "why": "Example: covers base costs so bigger bets become possible"
+    }
+  ],
+  "projects": [
+    {
+      "name": "Example: referral program",
+      "status": "active",
+      "notes": "Example: page drafted, not yet sent to past clients"
+    },
+    {
+      "name": "Example: podcast guesting push",
+      "status": "paused",
+      "notes": "Example: parked until the referral program ships"
+    }
+  ],
+  "moneyWatch": [
+    "Example: invoice 042 unpaid for 3 weeks",
+    "Example: annual software renewals due next month"
+  ],
+  "constraints": [
+    "Example: 25 focused hours per week",
+    "Example: no ad budget this quarter"
+  ],
+  "briefStyle": {
+    "tone": "direct, no fluff",
+    "maxWords": 600
+  }
+}

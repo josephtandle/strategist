@@ -1,0 +1,12 @@
+{
+  "name": "strategist",
+  "version": "0.2.1",
+  "description": "A daily chief-of-staff for one business owner: a six-persona strategy council that turns your config and notes into one short daily brief, via Claude Code.",
+  "license": "MIT",
+  "bin": {
+    "strategist": "bin/strategist.js"
+  },
+  "scripts": {
+    "test": "node tests/run-tests.js"
+  }
+}
