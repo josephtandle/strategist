@@ -65,4 +65,4 @@ Everything stays on your machine: your config, your notes, your briefs. The busi
 
 ## License
 
-MIT. Use it, change it, share it.
+Personal & Internal Use License. Free to use and modify for yourself or inside your own business. No reselling, no redistribution, no offering it as a service. See LICENSE for the full terms.
