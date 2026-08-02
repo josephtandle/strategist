@@ -1,0 +1,44 @@
+[
+  {
+    "id": "dalio",
+    "name": "Ray Dalio",
+    "domain": "decide/synthesize + radical truth",
+    "lens": "What is actually true vs hoped, and how should the others be believability-weighted?"
+  },
+  {
+    "id": "hormozi",
+    "name": "Alex Hormozi",
+    "domain": "offers/GTM",
+    "lens": "Is the offer so good they feel stupid saying no, and which value-equation lever is weakest?"
+  },
+  {
+    "id": "dunford",
+    "name": "April Dunford",
+    "domain": "positioning",
+    "lens": "Does each product own its category, or are we explaining instead of positioning?"
+  },
+  {
+    "id": "martin",
+    "name": "Roger Martin",
+    "domain": "portfolio focus",
+    "lens": "Where are we choosing to play this week, and which bet is being resourced by default?"
+  },
+  {
+    "id": "mcgrath",
+    "name": "Rita McGrath",
+    "domain": "advantage windows",
+    "lens": "Which side-bet has passed its window and should be harvested or cut?"
+  },
+  {
+    "id": "munger",
+    "name": "Charlie Munger",
+    "domain": "inversion/risk",
+    "lens": "Invert: what would guarantee this fails, and are we doing any of it?"
+  },
+  {
+    "id": "mckeown",
+    "name": "Greg McKeown",
+    "domain": "focus / essentialism",
+    "lens": "If it isn't a clear yes, it's a no. What is the ONE essential priority today; which current activities should be eliminated, not optimized. Protects the reader from majoring in minor things."
+  }
+]
