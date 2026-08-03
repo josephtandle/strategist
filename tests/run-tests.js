@@ -63,6 +63,32 @@ check('focus prompt exists with its three placeholders', () => {
   }
 });
 
+check('agent brain points to both shipped reasoning prompts', () => {
+  const brain = fs.readFileSync(path.join(ROOT, 'BRAIN.md'), 'utf8');
+  assert(brain.includes('prompts/council-brief-prompt.md'), 'council prompt is not mapped');
+  assert(brain.includes('prompts/focus-check-prompt.md'), 'focus prompt is not mapped');
+});
+
+check('recipes meet the natural-language routing convention', () => {
+  for (const name of ['generate-brief', 'focus-check']) {
+    const recipe = JSON.parse(
+      fs.readFileSync(path.join(ROOT, 'recipes', name + '.recipe.json'), 'utf8')
+    );
+    assert(recipe.taskClass === 'planning', name + ' taskClass must be planning');
+    assert(Array.isArray(recipe.phrases) && recipe.phrases.length >= 5, name + ' needs five phrases');
+    const generic = recipe.phrases.filter((phrase) => !/strategist/i.test(phrase));
+    assert(generic.length >= 2, name + ' needs two phrases without the product name');
+    const handler = require(path.join(ROOT, 'recipes', name + '.js'));
+    assert(typeof handler.runRecipe === 'function', name + ' handler must export runRecipe');
+  }
+});
+
+check('focus recipe fails gracefully without an activity', () => {
+  const result = require(path.join(ROOT, 'recipes', 'focus-check.js')).runRecipe();
+  assert(result.status === 'error', 'missing activity should return an error result');
+  assert(result.metadata.code === 'missing_activity', 'missing activity error should be stable');
+});
+
 check('council prompt has Follow-Through and multi-brief placeholder only', () => {
   const prompt = fs.readFileSync(
     path.join(ROOT, 'prompts', 'council-brief-prompt.md'),
