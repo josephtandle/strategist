@@ -17,6 +17,9 @@
  *   node bin/strategist.js brief --weekly   generate a weekly review instead
  *   node bin/strategist.js brief --print-prompt   write the prompt only (no Claude call)
  *   node bin/strategist.js focus "what I'm doing right now"   check for mid-day drift
+ *   node bin/strategist.js triage "item one; item two; item three"   rank candidate priorities
+ *   node bin/strategist.js decision "should I raise prices 20%"   frame a decision with the council
+ *   node bin/strategist.js review           audit whether recent Top 3 priorities actually moved
  *   node bin/strategist.js check            validate config and environment
  */
 
@@ -24,7 +27,7 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
-const VERSION = '0.2.3';
+const VERSION = '0.3.0';
 const PKG_ROOT = path.resolve(__dirname, '..');
 
 function home() {
@@ -140,6 +143,62 @@ function buildPrompt(opts) {
     .replace('{{NOTES}}', notes || 'No recent notes provided.')
     .replace('{{PREVIOUS_BRIEFS}}', previousBriefs || '(no previous briefs yet)')
     .replace('{{LEARNING}}', learning || 'No lessons recorded yet.');
+}
+
+function buildTriagePrompt(root, itemsText) {
+  const template = fs.readFileSync(
+    path.join(PKG_ROOT, 'prompts', 'triage-prompt.md'),
+    'utf8'
+  );
+  const cfg =
+    loadConfig(root) ||
+    loadJson(
+      fs.existsSync(path.join(root, 'config', 'business.example.json'))
+        ? path.join(root, 'config', 'business.example.json')
+        : path.join(PKG_ROOT, 'config', 'business.example.json')
+    );
+  const items = String(itemsText || '')
+    .split(/[;\n]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const itemsBlock = items.length
+    ? items.map((item, index) => `${index + 1}. ${item}`).join('\n')
+    : 'No items provided; triage using only the business config goals, moneyWatch, and active projects.';
+  return template
+    .replace('{{TODAY}}', today())
+    .replace('{{BUSINESS_JSON}}', JSON.stringify(cfg, null, 2))
+    .replace('{{ITEMS}}', itemsBlock);
+}
+
+function buildDecisionPrompt(root, decisionText) {
+  const template = fs.readFileSync(
+    path.join(PKG_ROOT, 'prompts', 'decision-council-prompt.md'),
+    'utf8'
+  );
+  const council = loadCouncil(root);
+  const cfg =
+    loadConfig(root) ||
+    loadJson(
+      fs.existsSync(path.join(root, 'config', 'business.example.json'))
+        ? path.join(root, 'config', 'business.example.json')
+        : path.join(PKG_ROOT, 'config', 'business.example.json')
+    );
+  return template
+    .replace('{{TODAY}}', today())
+    .replace('{{COUNCIL_JSON}}', JSON.stringify(council, null, 2))
+    .replace('{{BUSINESS_JSON}}', JSON.stringify(cfg, null, 2))
+    .replace('{{DECISION}}', decisionText);
+}
+
+function buildReviewPrompt(root) {
+  const template = fs.readFileSync(
+    path.join(PKG_ROOT, 'prompts', 'follow-through-review-prompt.md'),
+    'utf8'
+  );
+  const recent = recentBriefs(root, 7);
+  return template
+    .replace('{{TODAY}}', today())
+    .replace('{{RECENT_BRIEFS}}', recent || '(no previous briefs yet)');
 }
 
 function buildFocusPrompt(root, activity) {
@@ -271,6 +330,58 @@ function cmdFocus(root, activity) {
   return 0;
 }
 
+function cmdTriage(root, itemsText) {
+  ensureDirs(root);
+  const prompt = buildTriagePrompt(root, itemsText);
+  const promptPath = path.join(root, 'briefs', today() + '-triage-prompt.md');
+  const res = runClaude(prompt);
+  if (!res.ok) {
+    fs.writeFileSync(promptPath, prompt);
+    console.error('Could not run the claude command line tool: ' + res.detail);
+    console.error('Fallback: the full prompt was saved to ' + promptPath);
+    console.error('Paste its contents into Claude to get your triage.');
+    return 1;
+  }
+  console.log(res.text);
+  return 0;
+}
+
+function cmdDecision(root, decisionText) {
+  if (!decisionText) {
+    console.error('Tell Strategist what decision you are weighing. Example: node bin/strategist.js decision "should I raise prices 20% for new members"');
+    return 1;
+  }
+  ensureDirs(root);
+  const prompt = buildDecisionPrompt(root, decisionText);
+  const promptPath = path.join(root, 'briefs', today() + '-decision-prompt.md');
+  const res = runClaude(prompt);
+  if (!res.ok) {
+    fs.writeFileSync(promptPath, prompt);
+    console.error('Could not run the claude command line tool: ' + res.detail);
+    console.error('Fallback: the full prompt was saved to ' + promptPath);
+    console.error('Paste its contents into Claude to get the council\'s take.');
+    return 1;
+  }
+  console.log(res.text);
+  return 0;
+}
+
+function cmdReview(root) {
+  ensureDirs(root);
+  const prompt = buildReviewPrompt(root);
+  const promptPath = path.join(root, 'briefs', today() + '-review-prompt.md');
+  const res = runClaude(prompt);
+  if (!res.ok) {
+    fs.writeFileSync(promptPath, prompt);
+    console.error('Could not run the claude command line tool: ' + res.detail);
+    console.error('Fallback: the full prompt was saved to ' + promptPath);
+    console.error('Paste its contents into Claude to get your review.');
+    return 1;
+  }
+  console.log(res.text);
+  return 0;
+}
+
 function cmdBrief(root, opts) {
   const cfg = loadConfig(root);
   if (!cfg) {
@@ -338,10 +449,31 @@ function main() {
       console.error('[strategist] error: ' + String(e && e.message ? e.message : e).replace(/\s+/g, ' ').trim());
       code = 1;
     }
+  } else if (command === 'triage') {
+    try {
+      code = cmdTriage(root, args.slice(1).join(' ').trim());
+    } catch (e) {
+      console.error('[strategist] error: ' + String(e && e.message ? e.message : e).replace(/\s+/g, ' ').trim());
+      code = 1;
+    }
+  } else if (command === 'decision') {
+    try {
+      code = cmdDecision(root, args.slice(1).join(' ').trim());
+    } catch (e) {
+      console.error('[strategist] error: ' + String(e && e.message ? e.message : e).replace(/\s+/g, ' ').trim());
+      code = 1;
+    }
+  } else if (command === 'review') {
+    try {
+      code = cmdReview(root);
+    } catch (e) {
+      console.error('[strategist] error: ' + String(e && e.message ? e.message : e).replace(/\s+/g, ' ').trim());
+      code = 1;
+    }
   }
   else {
     console.error('Unknown command: ' + command);
-    console.error('Commands: setup, brief [--weekly] [--print-prompt], focus "current activity", check');
+    console.error('Commands: setup, brief [--weekly] [--print-prompt], focus "current activity", triage "item one; item two", decision "the decision", review, check');
     code = 1;
   }
   process.exit(code);
@@ -359,4 +491,7 @@ module.exports = {
   recentBriefs,
   buildPrompt,
   buildFocusPrompt,
+  buildTriagePrompt,
+  buildDecisionPrompt,
+  buildReviewPrompt,
 };

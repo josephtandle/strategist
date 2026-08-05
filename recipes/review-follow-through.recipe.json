@@ -1,0 +1,27 @@
+{
+  "id": "agent/strategist/review-follow-through",
+  "layer": "agent",
+  "owner": "strategist",
+  "title": "Review whether recent priorities actually moved",
+  "tags": ["strategy", "follow-through", "review", "planning"],
+  "phrases": [
+    "did last week's priorities actually move",
+    "review my follow-through",
+    "am I actually getting things done or just reshuffling",
+    "ask strategist for a follow-through review",
+    "check what's been carried over from previous briefs",
+    "how am I doing against my recent top three lists",
+    "audit whether I'm making real progress"
+  ],
+  "actions": ["review-follow-through"],
+  "safety": {
+    "destructive": false,
+    "notes": "Reads recent local briefs and returns a scorecard. Writes only inside the strategist briefs folder."
+  },
+  "inputMode": "structured",
+  "requiredContext": [],
+  "outputMode": "text",
+  "fallbackPolicy": "deterministic_first",
+  "taskClass": "planning",
+  "handler": "./review-follow-through.js"
+}
