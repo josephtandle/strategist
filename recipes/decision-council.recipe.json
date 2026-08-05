@@ -1,0 +1,27 @@
+{
+  "id": "agent/strategist/decision-council",
+  "layer": "agent",
+  "owner": "strategist",
+  "title": "Frame a decision with the strategy council",
+  "tags": ["strategy", "decision", "council", "planning"],
+  "phrases": [
+    "help me think through this decision",
+    "should I do this or not",
+    "bring this decision to the strategy council",
+    "ask strategist to frame this decision",
+    "what would the council say about this call",
+    "walk me through the tradeoffs on this decision",
+    "give me a second opinion on this business call"
+  ],
+  "actions": ["frame-decision"],
+  "safety": {
+    "destructive": false,
+    "notes": "Reasons about a decision and returns a recommendation. Never executes the decision or any other action."
+  },
+  "inputMode": "structured",
+  "requiredContext": [],
+  "outputMode": "text",
+  "fallbackPolicy": "deterministic_first",
+  "taskClass": "planning",
+  "handler": "./decision-council.js"
+}

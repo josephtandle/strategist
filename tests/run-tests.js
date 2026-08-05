@@ -38,6 +38,9 @@ for (const f of [
   ['config/business.example.json'],
   ['prompts/council-brief-prompt.md'],
   ['prompts/focus-check-prompt.md'],
+  ['prompts/triage-prompt.md'],
+  ['prompts/decision-council-prompt.md'],
+  ['prompts/follow-through-review-prompt.md'],
 ]) {
   fs.copyFileSync(path.join(ROOT, f[0]), path.join(sandbox, f[0]));
 }
@@ -63,14 +66,17 @@ check('focus prompt exists with its three placeholders', () => {
   }
 });
 
-check('agent brain points to both shipped reasoning prompts', () => {
+check('agent brain points to every shipped reasoning prompt', () => {
   const brain = fs.readFileSync(path.join(ROOT, 'BRAIN.md'), 'utf8');
   assert(brain.includes('prompts/council-brief-prompt.md'), 'council prompt is not mapped');
   assert(brain.includes('prompts/focus-check-prompt.md'), 'focus prompt is not mapped');
+  assert(brain.includes('prompts/triage-prompt.md'), 'triage prompt is not mapped');
+  assert(brain.includes('prompts/decision-council-prompt.md'), 'decision council prompt is not mapped');
+  assert(brain.includes('prompts/follow-through-review-prompt.md'), 'follow-through review prompt is not mapped');
 });
 
 check('recipes meet the natural-language routing convention', () => {
-  for (const name of ['generate-brief', 'focus-check']) {
+  for (const name of ['generate-brief', 'focus-check', 'triage-priorities', 'decision-council', 'review-follow-through']) {
     const recipe = JSON.parse(
       fs.readFileSync(path.join(ROOT, 'recipes', name + '.recipe.json'), 'utf8')
     );
@@ -87,6 +93,39 @@ check('focus recipe fails gracefully without an activity', () => {
   const result = require(path.join(ROOT, 'recipes', 'focus-check.js')).runRecipe();
   assert(result.status === 'error', 'missing activity should return an error result');
   assert(result.metadata.code === 'missing_activity', 'missing activity error should be stable');
+});
+
+check('decision recipe fails gracefully without a decision', () => {
+  const result = require(path.join(ROOT, 'recipes', 'decision-council.js')).runRecipe();
+  assert(result.status === 'error', 'missing decision should return an error result');
+  assert(result.metadata.code === 'missing_decision', 'missing decision error should be stable');
+});
+
+check('triage prompt fills every placeholder and handles an empty list', () => {
+  const prompt = strategist.buildTriagePrompt(sandbox, '');
+  assert(!/\{\{[A-Z_]+\}\}/.test(prompt), 'unfilled placeholder remains');
+  assert(prompt.includes('No items provided'), 'empty-list fallback message missing');
+});
+
+check('triage prompt numbers a provided item list', () => {
+  const prompt = strategist.buildTriagePrompt(sandbox, 'send the referral page; chase invoice 042');
+  assert(prompt.includes('1. send the referral page'), 'first item not numbered correctly');
+  assert(prompt.includes('2. chase invoice 042'), 'second item not numbered correctly');
+});
+
+check('decision prompt fills every placeholder and includes all seven personas', () => {
+  const prompt = strategist.buildDecisionPrompt(sandbox, 'should I raise prices 20%');
+  assert(!/\{\{[A-Z_]+\}\}/.test(prompt), 'unfilled placeholder remains');
+  assert(prompt.includes('should I raise prices 20%'), 'decision text missing');
+  for (const name of ['Dalio', 'Hormozi', 'Dunford', 'Martin', 'McGrath', 'Munger', 'McKeown']) {
+    assert(prompt.includes(name), 'council persona missing from decision prompt: ' + name);
+  }
+});
+
+check('review prompt fills every placeholder and degrades with no brief history', () => {
+  const prompt = strategist.buildReviewPrompt(sandbox);
+  assert(!/\{\{[A-Z_]+\}\}/.test(prompt), 'unfilled placeholder remains');
+  assert(prompt.includes('no previous briefs yet'), 'empty-history fallback message missing');
 });
 
 check('council prompt has Follow-Through and multi-brief placeholder only', () => {

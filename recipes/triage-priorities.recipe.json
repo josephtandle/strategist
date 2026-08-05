@@ -1,0 +1,27 @@
+{
+  "id": "agent/strategist/triage-priorities",
+  "layer": "agent",
+  "owner": "strategist",
+  "title": "Triage candidate priorities",
+  "tags": ["strategy", "priorities", "triage", "planning"],
+  "phrases": [
+    "help me triage my priorities",
+    "what should I focus on today",
+    "rank these tasks by priority",
+    "ask strategist to triage this list",
+    "which of these should I actually do first",
+    "sort my to-do list by what actually matters",
+    "run a strategist priority triage"
+  ],
+  "actions": ["triage-priorities"],
+  "safety": {
+    "destructive": false,
+    "notes": "Reads local business context and returns a ranked list. Writes only inside the strategist briefs folder."
+  },
+  "inputMode": "structured",
+  "requiredContext": [],
+  "outputMode": "text",
+  "fallbackPolicy": "deterministic_first",
+  "taskClass": "planning",
+  "handler": "./triage-priorities.js"
+}

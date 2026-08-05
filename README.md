@@ -34,12 +34,21 @@ Open `config/business.json` and replace every example value with the truth about
 node bin/strategist.js brief            # today's brief
 node bin/strategist.js brief --weekly   # weekly portfolio review instead
 node bin/strategist.js focus "rewriting the proposal"  # mid-day drift check
+node bin/strategist.js triage "send the referral page; chase invoice 042; prep podcast pitch"  # rank a raw list
+node bin/strategist.js decision "should I raise prices 20% for new members"  # frame a call with the council
+node bin/strategist.js review           # audit whether recent Top 3 priorities actually moved
 node bin/strategist.js check            # confirm config and setup are healthy
 ```
 
 Briefs are saved to `briefs/YYYY-MM-DD.md`. If the `claude` command is not installed, the tool writes the full prompt to a file instead and tells you to paste it into Claude yourself. Same brief, one extra step.
 
 `focus` prints a short, mid-day verdict: `ON TRACK`, `DRIFTING`, or `RABBIT HOLE`, tied to today's Top 3. It writes no brief on success. If no brief exists today, it assesses the current activity against the mission in your business config.
+
+`triage` takes a semicolon- or newline-separated list of candidate priorities and ranks them by money impact and time-sensitivity against your business config. Useful when you have a pile of things and no idea which one actually matters today. Leave it empty and it triages from your config's goals, money watch, and active projects instead.
+
+`decision` brings one specific decision to the same seven-persona council used for the daily brief, but scoped to just that call. Each persona gives a one-line take, the chairman synthesizes a recommendation with a confidence score, and dissent is preserved rather than averaged away.
+
+`review` audits your recent briefs on their own, without generating a new one: which Top 3 items actually moved, which are being carried forward without progress, and whether that's becoming a pattern. Needs at least two previous briefs to say anything useful.
 
 ## Feeding it context
 
