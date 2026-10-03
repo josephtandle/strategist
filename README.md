@@ -75,3 +75,14 @@ Everything stays on your machine: your config, your notes, your briefs. The busi
 ## License
 
 Personal Use License. You can use this for yourself, but you cannot resell it, share it, or use it in any commercial service. If you need to use it commercially, reach out through the distributor listed with your copy and we can figure out something that makes sense. See LICENSE for the full terms.
+
+## Updates
+
+This updates itself every week from this repo. Before it changes anything it backs up your own files, and if the self-test fails after an update it rolls back to the version you had. Your own files (config, notes, brand files, data) are never overwritten.
+
+```
+node scripts/self-update.js --status   # see the setting and the last check
+node scripts/self-update.js --now      # check and update right now
+node scripts/self-update.js --off      # turn weekly updates off
+node scripts/self-update.js --on       # turn them back on
+```

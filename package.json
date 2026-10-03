@@ -7,6 +7,7 @@
     "strategist": "bin/strategist.js"
   },
   "scripts": {
-    "test": "node tests/run-tests.js"
+    "test": "node tests/run-tests.js",
+    "selftest": "node tests/run-tests.js"
   }
 }
